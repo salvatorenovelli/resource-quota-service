@@ -11,11 +11,11 @@ import java.time.Duration;
 /**
  * Allow users to interact with the crawler within a certain quota
  */
-public class TimedResourceQuota implements ResourceQuota {
+public class UserQuotaManager {
 
     private final Bucket bucket;
 
-    public TimedResourceQuota(int limit, Duration duration, Clock clock) {
+    public UserQuotaManager(int limit, Duration duration, Clock clock) {
         Bandwidth bw = Bandwidth.simple(limit, duration);
         TimeMeter customTimeMeter = getClockBasedTimeMeter(clock);
         bucket = Bucket.builder()
@@ -24,12 +24,10 @@ public class TimedResourceQuota implements ResourceQuota {
                 .build();
     }
 
-    @Override
     public boolean tryConsume(int quantity) {
         return bucket.tryConsume(quantity);
     }
 
-    @Override
     public long getRemaining() {
         return bucket.getAvailableTokens();
     }

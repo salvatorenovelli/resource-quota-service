@@ -1,7 +1,6 @@
 package com.myseotoolbox.resourcequota;
 
 
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -17,9 +16,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
-public class TimedResourceQuotaTest {
+public class UserQuotaManagerTest {
 
-    TimedResourceQuota sut;
+    UserQuotaManager sut;
     Instant testTime = Instant.ofEpochMilli(0);
     private TestClock testClock = new TestClock(testTime);
 
@@ -28,6 +27,7 @@ public class TimedResourceQuotaTest {
         sut = givenResourceQuota().withDailyLimit(10).build();
     }
 
+    @Test
     public void shouldReplenishQuotaWhenTimeExpires() {
         sut.tryConsume(10);
         setCurrentTimeTo(testTime.plus(1, ChronoUnit.DAYS));
@@ -73,8 +73,8 @@ public class TimedResourceQuotaTest {
             return this;
         }
 
-        public TimedResourceQuota build() {
-            return new TimedResourceQuota(limit, duration, testClock);
+        public UserQuotaManager build() {
+            return new UserQuotaManager(limit, duration, testClock);
         }
     }
 
