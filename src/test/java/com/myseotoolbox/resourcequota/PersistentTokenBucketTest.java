@@ -1,8 +1,12 @@
 package com.myseotoolbox.resourcequota;
 
 
+import com.myseotoolbox.resourcequota.model.BucketPersistence;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Clock;
 import java.time.Duration;
@@ -12,19 +16,36 @@ import java.time.temporal.ChronoUnit;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
+@ExtendWith(MockitoExtension.class)
+public class PersistentTokenBucketTest {
 
-public class UserQuotaManagerTest {
-
-    UserQuotaManager sut;
+    PersistentTokenBucket sut;
     Instant testTime = Instant.ofEpochMilli(0);
     private TestClock testClock = new TestClock(testTime);
+    @Mock private BucketPersistence bucketPersistence;
+
 
     @BeforeEach
-    public void setUp() throws Exception {
+    public void setUp() {
         sut = givenResourceQuota().withDailyLimit(10).build();
+    }
+
+
+    @Test
+    void shouldAllowToConsumeTokens() {
+        assertTrue(sut.tryConsume(1));
+    }
+
+    @Test
+    public void shouldNotAllowToExceedQuota() {
+        assertFalse(sut.tryConsume(11));
+    }
+    @Test
+    public void shouldNotAllowToExceedQuotaWithSubsequentRequests() {
+        assertTrue(sut.tryConsume(10));
+        assertFalse(sut.tryConsume(1));
     }
 
     @Test
@@ -35,8 +56,12 @@ public class UserQuotaManagerTest {
     }
 
     @Test
-    public void shouldNotAllowToExceedQuota() {
-        assertFalse(sut.tryConsume(11));
+    void shouldNotReplenishEarly() {
+        sut.tryConsume(10);
+        Instant enoughTime = testTime.plus(1, ChronoUnit.DAYS);
+        Instant notEnoughTime = enoughTime.minusMillis(1);
+        setCurrentTimeTo(notEnoughTime);
+        assertFalse(sut.tryConsume(1));
     }
 
     @Test
@@ -59,6 +84,21 @@ public class UserQuotaManagerTest {
         assertThat(sut.getRemaining(), is(10L));
     }
 
+    @Test
+    void shouldNotOverrideExistingStateOnPersistentLayer() {
+        fail();
+    }
+
+    @Test
+    void shouldRecoverExistingStateFromPersistentLayer() {
+
+    }
+
+    @Test
+    void shouldCreateNewPersistentRecordIfNoStateIsFound() {
+
+    }
+
     private TimedResourceQuotaBuilder givenResourceQuota() {
         return new TimedResourceQuotaBuilder();
     }
@@ -73,8 +113,8 @@ public class UserQuotaManagerTest {
             return this;
         }
 
-        public UserQuotaManager build() {
-            return new UserQuotaManager(limit, duration, testClock);
+        public PersistentTokenBucket build() {
+            return new PersistentTokenBucket(bucketPersistence, "test bucket", limit, duration, testClock);
         }
     }
 
