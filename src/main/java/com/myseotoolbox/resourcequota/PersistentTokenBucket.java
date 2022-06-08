@@ -20,9 +20,12 @@ public class PersistentTokenBucket implements TokenBucket {
     public PersistentTokenBucket(BucketPersistence bucketPersistence, String bucketKey, long defaultQuantity, Duration defaultDuration, Clock clock) {
         this.bucketPersistence = bucketPersistence;
         this.clock = clock;
-        BucketState state = retrieveBucketState(bucketKey)
-                .orElse(new BucketState(new Limit(defaultQuantity, defaultDuration), defaultQuantity, clock.instant()));
-        this.currentState = state;
+        this.currentState = retrieveBucketState(bucketKey)
+                .orElseGet(() -> {
+                    BucketState bucketState = new BucketState(new Limit(defaultQuantity, defaultDuration), defaultQuantity, clock.instant());
+                    bucketPersistence.save(bucketState);
+                    return bucketState;
+                });
     }
 
     @Override
@@ -30,7 +33,7 @@ public class PersistentTokenBucket implements TokenBucket {
         Instant requestInstant = clock.instant();
         refill(requestInstant);
         if (currentState.remainingTokens() >= quantity) {
-            currentState = recreate(currentState.remainingTokens() - quantity, requestInstant);
+            updateState(currentState.remainingTokens() - quantity, requestInstant);
             return true;
         } else {
             return false;
@@ -39,14 +42,20 @@ public class PersistentTokenBucket implements TokenBucket {
 
     @Override
     public long getRemaining() {
-        throw new UnsupportedOperationException("Not implemented yet!");
+        refill(clock.instant());
+        return currentState.remainingTokens();
     }
 
     private void refill(Instant requestInstant) {
         Duration durationSinceLastRefill = Duration.between(currentState.lastRefill(), requestInstant);
         if (durationSinceLastRefill.compareTo(currentState.limit().duration()) >= 0) {
-            currentState = recreate(currentState.limit().quantity(), requestInstant);
+            updateState(currentState.limit().quantity(), requestInstant);
         }
+    }
+
+    private void updateState(long quantity, Instant requestInstant) {
+        currentState = recreate(quantity, requestInstant);
+        bucketPersistence.save(currentState);
     }
 
     private BucketState recreate(long quantity, Instant lastRefill) {
@@ -54,18 +63,8 @@ public class PersistentTokenBucket implements TokenBucket {
     }
 
     private Optional<BucketState> retrieveBucketState(String bucketKey) {
-        if (bucketExist(bucketKey)) {
-            return Optional.of(restoreBucket(bucketKey));
-        }
-        return Optional.empty();
+        return bucketPersistence.getBucketState(bucketKey);
     }
 
-    private BucketState restoreBucket(String bucketKey) {
-        throw new UnsupportedOperationException("Not implemented yet!");
-    }
-
-    private boolean bucketExist(String bucketKey) {
-        return false;
-    }
 
 }
