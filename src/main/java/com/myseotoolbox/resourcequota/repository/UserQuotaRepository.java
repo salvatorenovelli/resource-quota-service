@@ -1,6 +1,6 @@
 package com.myseotoolbox.resourcequota.repository;
 
-import com.myseotoolbox.resourcequota.model.BucketState;
+import com.github.simpletokenbucket.BucketState;
 
 public class UserQuotaRepository {
     public BucketState getUserQuota(String username, String resourceId) {
