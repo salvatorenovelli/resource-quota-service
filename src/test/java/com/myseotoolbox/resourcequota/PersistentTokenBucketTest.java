@@ -39,30 +39,29 @@ public class PersistentTokenBucketTest {
     PersistentTokenBucket sut;
 
 
-    @BeforeEach
-    public void setUp() {
-        sut = givenTokenBucket().withLimit(DEFAULT_QUOTA_LIMIT).build();
-    }
-
 
     @Test
     void shouldAllowToConsumeTokens() {
+        sut = givenTokenBucket().withLimit(DEFAULT_QUOTA_LIMIT).build();
         assertTrue(sut.tryConsume(1));
     }
 
     @Test
     public void shouldNotAllowToExceedQuota() {
+        sut = givenTokenBucket().withLimit(DEFAULT_QUOTA_LIMIT).build();
         assertFalse(sut.tryConsume(11));
     }
 
     @Test
     public void shouldNotAllowToExceedQuotaWithSubsequentRequests() {
+        sut = givenTokenBucket().withLimit(DEFAULT_QUOTA_LIMIT).build();
         assertTrue(sut.tryConsume(10));
         assertFalse(sut.tryConsume(1));
     }
 
     @Test
     public void shouldReplenishQuotaWhenTimeExpires() {
+        sut = givenTokenBucket().withLimit(DEFAULT_QUOTA_LIMIT).build();
         sut.tryConsume(10);
         setCurrentTimeTo(testTime.plus(1, ChronoUnit.DAYS));
         assertTrue(sut.tryConsume(10));
@@ -70,6 +69,7 @@ public class PersistentTokenBucketTest {
 
     @Test
     void shouldNotReplenishEarly() {
+        sut = givenTokenBucket().withLimit(DEFAULT_QUOTA_LIMIT).build();
         sut.tryConsume(10);
         Instant enoughTime = testTime.plus(1, ChronoUnit.DAYS);
         Instant notEnoughTime = enoughTime.minusMillis(1);
@@ -79,12 +79,14 @@ public class PersistentTokenBucketTest {
 
     @Test
     public void shouldProvideRemainingQuantity() {
+        sut = givenTokenBucket().withLimit(DEFAULT_QUOTA_LIMIT).build();
         sut.tryConsume(5);
         assertThat(sut.getRemaining(), is(5L));
     }
 
     @Test
     public void shouldReplenishAvailableWithoutWrite() {
+        sut = givenTokenBucket().withLimit(DEFAULT_QUOTA_LIMIT).build();
         sut.tryConsume(5);
         setCurrentTimeTo(testTime.plus(1, ChronoUnit.DAYS));
         assertThat(sut.getRemaining(), is(10L));
@@ -92,6 +94,7 @@ public class PersistentTokenBucketTest {
 
     @Test
     public void quotaIsNotCumulative() {
+        sut = givenTokenBucket().withLimit(DEFAULT_QUOTA_LIMIT).build();
         assertThat(sut.getRemaining(), is(10L));
         setCurrentTimeTo(testTime.plus(10, ChronoUnit.DAYS));
         assertThat(sut.getRemaining(), is(10L));
@@ -125,12 +128,6 @@ public class PersistentTokenBucketTest {
     }
 
     @Test
-    @DisplayName("Existing state on loading should remain the same, in the persistent layer")
-    void shouldNotOverrideExistingStateOnPersistentLayerOnLoading() {
-
-    }
-
-    @Test
     void shouldNotPersistIfNoStateChange() {
         giveExistingBucketStateForKey(TEST_BUCKET_KEY)
                 .build();
@@ -145,14 +142,13 @@ public class PersistentTokenBucketTest {
     void shouldCreateNewPersistentRecordIfNoStateIsFound() {
         //given no existing bucket in persistent layer
 
-        //token is created in @BeforeAll
+        sut = givenTokenBucket().withLimit(DEFAULT_QUOTA_LIMIT).build();
 
         verify(bucketPersistence, times(1)).save(new BucketState(DEFAULT_QUOTA_LIMIT, DEFAULT_QUOTA_LIMIT.quantity(), testTime));
     }
 
     @Test
     void shouldUpdateWhenStateChanges() {
-
         sut = givenTokenBucket().withLimit(DEFAULT_QUOTA_LIMIT).build();
 
         setCurrentTimeTo(testTime.plus(30, ChronoUnit.SECONDS));
@@ -185,7 +181,6 @@ public class PersistentTokenBucketTest {
     }
 
     private void setCurrentTimeTo(Instant instant) {
-        System.out.println("Setting local time to: " + instant);
         this.testClock.setTime(instant);
     }
 
