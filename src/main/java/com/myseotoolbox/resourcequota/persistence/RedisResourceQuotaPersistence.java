@@ -10,15 +10,14 @@ import java.util.Collection;
 import java.util.Optional;
 
 @Component
-public class CrudResourceQuotaPersistence implements ResourceQuotaPersistence {
+public class RedisResourceQuotaPersistence implements ResourceQuotaPersistence {
 
     private static final String KEY = "ResourceQuota";
     private final HashOperations<String, String, ResourceQuota> hashOperations;
 
-    public CrudResourceQuotaPersistence(RedisTemplate redisTemplate) {
+    public RedisResourceQuotaPersistence(RedisTemplate redisTemplate) {
         hashOperations = redisTemplate.opsForHash();
     }
-
 
     @Override
     public ResourceQuota save(ResourceQuota resourceQuota) {

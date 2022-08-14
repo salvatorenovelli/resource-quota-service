@@ -11,12 +11,12 @@ import java.util.Collection;
 import java.util.Optional;
 
 @Component
-public class CrudUserQuotaPersistence implements UserQuotaPersistence {
+public class RedisUserQuotaPersistence implements UserQuotaPersistence {
 
     private static final String KEY = "UserQuota";
     private final HashOperations<String, UserQuotaId, UserQuotaState> hashOperations;
 
-    public CrudUserQuotaPersistence(RedisTemplate redisTemplate) {
+    public RedisUserQuotaPersistence(RedisTemplate redisTemplate) {
         hashOperations = redisTemplate.opsForHash();
     }
 
