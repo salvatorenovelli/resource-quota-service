@@ -1,5 +1,6 @@
 package com.myseotoolbox.resourcequota;
 
+import io.github.quota4j.QuotaManagerNotRegisteredException;
 import io.github.quota4j.ResourceQuotaNotFoundException;
 import io.github.quota4j.UserQuotaService;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,8 @@ public class QuotaController {
                 return ResponseEntity.status(HttpStatus.TOO_MANY_REQUESTS).build();
         } catch (ResourceQuotaNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (QuotaManagerNotRegisteredException e){
+            return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(e.getMessage());
         }
 
         return ResponseEntity.ok().build();

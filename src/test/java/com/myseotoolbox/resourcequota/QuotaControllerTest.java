@@ -1,6 +1,7 @@
 package com.myseotoolbox.resourcequota;
 
 
+import io.github.quota4j.QuotaManagerNotRegisteredException;
 import io.github.quota4j.ResourceQuotaNotFoundException;
 import io.github.quota4j.UserQuotaService;
 import org.junit.jupiter.api.Test;
@@ -58,6 +59,15 @@ class QuotaControllerTest extends DataRedisContainerTest {
         mockMvc.perform(get("/resources/" + NON_EXISTING_RESOURCE_ID + "/workspaces/123456"))
                 .andExpect(status().is(NOT_FOUND.value()))
                 .andExpect(content().string(containsString(NON_EXISTING_RESOURCE_ID)));
+    }
+
+    @Test
+    void shouldHandleQuotaManagerNotFound() throws Exception {
+        Mockito.when(userQuotaService.tryAcquire(anyString(), anyString(), anyInt())).thenThrow(new QuotaManagerNotRegisteredException("NON_REGISTERED_QUOTA_MANAGER"));
+
+        mockMvc.perform(get("/resources/" + NON_EXISTING_RESOURCE_ID + "/workspaces/123456"))
+                .andExpect(status().is(NOT_IMPLEMENTED.value()))
+                .andExpect(content().string(containsString("NON_REGISTERED_QUOTA_MANAGER")));
     }
 
     private QuotaBuilder givenResourceQuota(String resourceId) {
