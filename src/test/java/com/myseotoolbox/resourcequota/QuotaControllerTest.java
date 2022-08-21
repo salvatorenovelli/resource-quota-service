@@ -3,7 +3,7 @@ package com.myseotoolbox.resourcequota;
 
 import io.github.quota4j.QuotaManagerNotRegisteredException;
 import io.github.quota4j.ResourceQuotaNotFoundException;
-import io.github.quota4j.UserQuotaService;
+import io.github.quota4j.QuotaService;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +29,7 @@ class QuotaControllerTest extends DataRedisContainerTest {
     MockMvc mockMvc;
 
     @MockBean
-    UserQuotaService userQuotaService;
+    QuotaService quotaService;
 
 
     @Test
@@ -54,7 +54,7 @@ class QuotaControllerTest extends DataRedisContainerTest {
 
     @Test
     void shouldHandleResourceNotFound() throws Exception {
-        Mockito.when(userQuotaService.tryAcquire(anyString(), anyString(), anyInt())).thenThrow(new ResourceQuotaNotFoundException(NON_EXISTING_RESOURCE_ID));
+        Mockito.when(quotaService.tryAcquire(anyString(), anyString(), anyInt())).thenThrow(new ResourceQuotaNotFoundException(NON_EXISTING_RESOURCE_ID));
 
         mockMvc.perform(get("/resources/" + NON_EXISTING_RESOURCE_ID + "/workspaces/123456"))
                 .andExpect(status().is(NOT_FOUND.value()))
@@ -63,7 +63,7 @@ class QuotaControllerTest extends DataRedisContainerTest {
 
     @Test
     void shouldHandleQuotaManagerNotFound() throws Exception {
-        Mockito.when(userQuotaService.tryAcquire(anyString(), anyString(), anyInt())).thenThrow(new QuotaManagerNotRegisteredException("NON_REGISTERED_QUOTA_MANAGER"));
+        Mockito.when(quotaService.tryAcquire(anyString(), anyString(), anyInt())).thenThrow(new QuotaManagerNotRegisteredException("NON_REGISTERED_QUOTA_MANAGER"));
 
         mockMvc.perform(get("/resources/" + NON_EXISTING_RESOURCE_ID + "/workspaces/123456"))
                 .andExpect(status().is(NOT_IMPLEMENTED.value()))
@@ -88,7 +88,7 @@ class QuotaControllerTest extends DataRedisContainerTest {
         }
 
         public void build() {
-            Mockito.when(userQuotaService.tryAcquire(anyString(), Mockito.eq(resourceId), anyInt())).thenAnswer(invocation -> {
+            Mockito.when(quotaService.tryAcquire(anyString(), Mockito.eq(resourceId), anyInt())).thenAnswer(invocation -> {
                 Integer quantity = invocation.getArgument(2, Integer.class);
                 remainingTokens -= quantity;
                 return remainingTokens > 0;
