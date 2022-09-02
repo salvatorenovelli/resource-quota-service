@@ -2,7 +2,7 @@ package com.myseotoolbox.resourcequota;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -24,12 +24,10 @@ public class DataRedisContainerTest {
 
     private static final int REDIS_PORT = 6379;
 
-    private static final GenericContainer<?> redis = new GenericContainer(DockerImageName.parse("redis:5.0.3-alpine")).withExposedPorts(REDIS_PORT);
-
     @Autowired
     RedisConnectionFactory connectionFactory;
 
-    @BeforeEach
+    @AfterEach
     void dataRedisContainerTestSetup() {
         connectionFactory.getConnection().flushAll();
     }
@@ -38,16 +36,31 @@ public class DataRedisContainerTest {
 
         @Override
         public void initialize(ConfigurableApplicationContext applicationContext) {
-            if(!redis.isRunning()){
-                redis.start();
-                log.info("Redis server is available at {}:{}", redis.getHost(), redis.getMappedPort(REDIS_PORT));
-                TestPropertyValues values = TestPropertyValues.of(
-                        "spring.redis.host=" + redis.getHost(),
-                        "spring.redis.port=" + redis.getMappedPort(REDIS_PORT)
-                );
-                values.applyTo(applicationContext);
+
+            GenericContainer<?> redis = new GenericContainer(DockerImageName.parse("redis:5.0.3-alpine")).withExposedPorts(REDIS_PORT);
+            redis.start();
+            while (!redis.isRunning()) {
+                busyWaitIMSorry();
             }
 
+
+            log.info("Redis server is available at {}:{}", redis.getHost(), redis.getMappedPort(REDIS_PORT));
+
+            TestPropertyValues values = TestPropertyValues.of(
+                    "spring.redis.host=" + redis.getHost(),
+                    "spring.redis.port=" + redis.getMappedPort(REDIS_PORT)
+            );
+            values.applyTo(applicationContext);
+
+        }
+
+        private static void busyWaitIMSorry()  {
+            try {
+                Thread.sleep(50);
+                log.info("Busy wait..zZzZzzZ...");
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
