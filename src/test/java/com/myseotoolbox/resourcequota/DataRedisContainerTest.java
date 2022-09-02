@@ -1,5 +1,7 @@
 package com.myseotoolbox.resourcequota;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +20,7 @@ import org.testcontainers.utility.DockerImageName;
 @ContextConfiguration(initializers = DataRedisContainerTest.RedisContainerContextInitializer.class)
 public class DataRedisContainerTest {
 
-    private static final org.apache.logging.log4j.Logger log = org.apache.logging.log4j.LogManager.getLogger(DataRedisContainerTest.class);
+    private static final Logger log = LogManager.getLogger(DataRedisContainerTest.class);
 
     private static final int REDIS_PORT = 6379;
 
