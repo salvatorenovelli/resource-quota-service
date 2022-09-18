@@ -1,8 +1,8 @@
 package com.myseotoolbox.resourcequota;
 
-import io.github.quota4j.QuotaManagerNotRegisteredException;
-import io.github.quota4j.ResourceQuotaNotFoundException;
-import io.github.quota4j.QuotaService;
+import com.myseotoolbox.quota4j.QuotaManagerNotRegisteredException;
+import com.myseotoolbox.quota4j.QuotaService;
+import com.myseotoolbox.quota4j.ResourceQuotaNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

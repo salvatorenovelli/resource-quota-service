@@ -1,8 +1,8 @@
 package com.myseotoolbox.resourcequota;
 
-import io.github.quota4j.QuotaService;
-import io.github.quota4j.persistence.ResourceQuotaPersistence;
-import io.github.quota4j.persistence.QuotaPersistence;
+import com.myseotoolbox.quota4j.QuotaService;
+import com.myseotoolbox.quota4j.persistence.QuotaPersistence;
+import com.myseotoolbox.quota4j.persistence.ResourceQuotaPersistence;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 

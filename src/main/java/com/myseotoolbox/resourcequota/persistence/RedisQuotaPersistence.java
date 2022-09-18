@@ -1,8 +1,8 @@
 package com.myseotoolbox.resourcequota.persistence;
 
-import io.github.quota4j.model.QuotaId;
-import io.github.quota4j.model.QuotaState;
-import io.github.quota4j.persistence.QuotaPersistence;
+import com.myseotoolbox.quota4j.model.QuotaId;
+import com.myseotoolbox.quota4j.model.QuotaState;
+import com.myseotoolbox.quota4j.persistence.QuotaPersistence;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;

@@ -1,8 +1,8 @@
 package com.myseotoolbox.resourcequota.persistence;
 
 import com.myseotoolbox.resourcequota.DataRedisContainerTest;
-import io.github.quota4j.model.QuotaId;
-import io.github.quota4j.model.QuotaState;
+import com.myseotoolbox.quota4j.model.QuotaId;
+import com.myseotoolbox.quota4j.model.QuotaState;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
