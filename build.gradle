@@ -40,6 +40,12 @@ task getImageName {
     }
 }
 
+task getArtifactName {
+    doLast {
+        println rootProject.name
+    }
+}
+
 dependencyManagement {
     imports {
         mavenBom "org.testcontainers:testcontainers-bom:${testcontainersVersion}"

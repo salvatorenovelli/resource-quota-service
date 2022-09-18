@@ -19,6 +19,7 @@ jobs:
       - name: Setting context
         run: |
           echo "image_name=${IMAGE_NAME_ROOT}/$(./gradlew -q getImageName)" >> $GITHUB_ENV
+          echo "artifact_name=$(./gradlew -q getArtifactName)" >> $GITHUB_ENV
 
       - name: Login in GCP
         uses: google-github-actions/setup-gcloud@v0.6.0
@@ -32,6 +33,11 @@ jobs:
 
       - name: Build with Gradle
         run: ./gradlew build
+
+      - name: Build docker image
+        run: |
+          cp build/libs/*.jar "docker/${{env.artifact-name}}.jar" || exit 1
+          docker build docker -t ${{ env.image_name }}
 
       - name: Push Docker image
         run: docker push ${{ env.image_name }}
