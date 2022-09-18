@@ -34,9 +34,9 @@ jar {
     enabled = false
 }
 
-task getProjectProperties {
+task getImageName {
     doLast {
-        println rootProject.group + ":" + rootProject.name + ":" + rootProject.version + ":" + rootProject.name
+        println rootProject.name + ":" + rootProject.version
     }
 }
 
