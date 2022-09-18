@@ -26,7 +26,7 @@ class RedisResourceQuotaPersistenceTest extends DataRedisContainerTest {
 
     @Test
     void shouldFindMultiple() {
-        assertThat(sut.findAll(), Matchers.contains(
+        assertThat(sut.findAll(), Matchers.containsInAnyOrder(
                 new ResourceQuota("ID1", "ClassName", "Initial State"),
                 new ResourceQuota("ID2", "ClassName", "Initial State")
         ));
