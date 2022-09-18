@@ -6,7 +6,7 @@ jobs:
     name: Setup Gcloud Account
     runs-on: ubuntu-latest
     env:
-      IMAGE_NAME: eu.gcr.io/${{ secrets.GCP_PROJECT_ID }}/
+      IMAGE_NAME_ROOT: eu.gcr.io/${{ secrets.GCP_PROJECT_ID }}
     steps:
       - name: Check out code
         uses: actions/checkout@v2
@@ -15,40 +15,25 @@ jobs:
         with:
           java-version: 17
           distribution: 'adopt'
-      - name: Build with Gradle
-        run: ./gradlew build
+
       - name: Setting context
         run: |
-          echo "image_name=$(./gradlew -q getImageName)" >> $GITHUB_ENV
-      - name: Use the value
-        id: step_two
-        run: |
+          echo "image_name=${IMAGE_NAME_ROOT}/$(./gradlew -q getImageName)" >> $GITHUB_ENV
           echo "${{ env.image_name }}"
 
-#
-#
-#      - name: Login
-#        uses: google-github-actions/setup-gcloud@master
-#        with:
-#          project_id: ${{ secrets.GCP_PROJECT_ID }}
-#          service_account_email: ${{ secrets.GCP_EMAIL }}
-#          service_account_key: ${{ secrets.GCP_KEY }}
-#
-#      - name: Configure Docker
-#        run: gcloud auth configure-docker --quiet
-#
-#      - name: Set up JDK 17
-#        uses: actions/setup-java@v2
-#        with:
-#          java-version: 17
-#          distribution: 'adopt'
-#
-#      - name: Build with Gradle
-#        run: ./gradlew build
-#
+      - name: Login in GCP
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_email: ${{ secrets.GCP_EMAIL }}
+          service_account_key: ${{ secrets.GCP_CREDENTIALS }}
+
+      - name: Configure Docker
+        run: gcloud auth configure-docker --quiet
+
+      - name: Build with Gradle
+        run: ./gradlew build
+
 #      - name: Push Docker image
-#        run: docker push $IMAGE_NAME
-#
-#      - name: Deploy Docker image
-#        run: gcloud run deploy ${{ secrets.GCP_PROJECT_ID }} --image $IMAGE_NAME --region us-central1 --platform managed
+#        run: docker push ${{ env.image_name }}
 
