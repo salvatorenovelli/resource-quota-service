@@ -31,12 +31,12 @@ jobs:
       - name: Configure Docker
         run: gcloud auth configure-docker --quiet
 
-      - name: Build with Gradle
+      - name: Build jar
         run: ./gradlew build
 
       - name: Build docker image
         run: |
-          cp build/libs/*.jar "docker/${{env.artifact-name}}.jar" || exit 1
+          cp build/libs/*.jar "docker/${{env.artifact_name}}.jar" || exit 1
           docker build docker -t ${{ env.image_name }}
 
       - name: Push Docker image
