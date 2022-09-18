@@ -3,7 +3,7 @@ on: [ push ]
 jobs:
   deploy:
 
-    name: Setup Gcloud Account
+    name: Build and push to GCR
     runs-on: ubuntu-latest
     env:
       IMAGE_NAME_ROOT: eu.gcr.io/${{ secrets.GCP_PROJECT_ID }}
@@ -19,7 +19,6 @@ jobs:
       - name: Setting context
         run: |
           echo "image_name=${IMAGE_NAME_ROOT}/$(./gradlew -q getImageName)" >> $GITHUB_ENV
-          echo "${{ env.image_name }}"
 
       - name: Login in GCP
         uses: google-github-actions/setup-gcloud@v0.6.0
@@ -34,6 +33,6 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build
 
-#      - name: Push Docker image
-#        run: docker push ${{ env.image_name }}
+      - name: Push Docker image
+        run: docker push ${{ env.image_name }}
 
