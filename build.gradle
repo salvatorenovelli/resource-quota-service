@@ -30,6 +30,16 @@ dependencies {
 
 }
 
+jar {
+    enabled = false
+}
+
+task getProjectProperties {
+    doLast {
+        println rootProject.group + ":" + rootProject.name + ":" + rootProject.version + ":" + rootProject.name
+    }
+}
+
 dependencyManagement {
     imports {
         mavenBom "org.testcontainers:testcontainers-bom:${testcontainersVersion}"
