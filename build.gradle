@@ -12,13 +12,11 @@ repositories {
     mavenCentral()
 }
 
-ext {
-    set('testcontainersVersion', "1.17.3")
-}
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
     implementation 'com.myseotoolbox.quota4j:quota4j:1.0.6'
     compileOnly 'org.projectlombok:lombok'
     testCompileOnly 'org.projectlombok:lombok'
@@ -49,12 +47,6 @@ task getArtifactName {
 task getProjectProperties {
     doLast {
         println rootProject.group + ":" + rootProject.name + ":" + rootProject.version + ":" + rootProject.name
-    }
-}
-
-dependencyManagement {
-    imports {
-        mavenBom "org.testcontainers:testcontainers-bom:${testcontainersVersion}"
     }
 }
 

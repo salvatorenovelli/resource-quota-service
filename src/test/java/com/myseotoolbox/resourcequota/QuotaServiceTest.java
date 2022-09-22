@@ -1,7 +1,5 @@
 package com.myseotoolbox.resourcequota;
 
-import com.myseotoolbox.resourcequota.persistence.RedisResourceQuotaPersistence;
-import com.myseotoolbox.resourcequota.persistence.RedisQuotaPersistence;
 import com.myseotoolbox.quota4j.QuotaService;
 import com.myseotoolbox.quota4j.model.QuotaId;
 import com.myseotoolbox.quota4j.model.QuotaState;
@@ -9,9 +7,13 @@ import com.myseotoolbox.quota4j.model.ResourceQuota;
 import com.myseotoolbox.quota4j.quotamanager.quantityovertime.QuantityOverTimeLimit;
 import com.myseotoolbox.quota4j.quotamanager.quantityovertime.QuantityOverTimeQuotaManager;
 import com.myseotoolbox.quota4j.quotamanager.quantityovertime.QuantityOverTimeState;
+import com.myseotoolbox.resourcequota.persistence.MongoQuotaPersistence;
+import com.myseotoolbox.resourcequota.persistence.MongoResourceQuotaPersistence;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
+import org.springframework.context.annotation.ComponentScan;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -19,20 +21,23 @@ import java.time.Instant;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class QuotaServiceTest extends DataRedisContainerTest {
+@DataMongoTest
+@ComponentScan(value="com.myseotoolbox.resourcequota.persistence")
+public class QuotaServiceTest {
     public static final String RESOURCE_ID = "group.resourceId";
     public static final String OWNER_ID = "salvatore";
+
     @Autowired
+    MongoResourceQuotaPersistence resourceQuotaPersistence;
+    @Autowired
+    MongoQuotaPersistence quotaPersistence;
+
     QuotaService sut;
-
-    @Autowired
-    RedisResourceQuotaPersistence resourceQuotaRepository;
-
-    @Autowired
-    RedisQuotaPersistence quotaPersistence;
 
     @BeforeEach
     void setUp() {
+        sut = new QuotaService(resourceQuotaPersistence, quotaPersistence);
+
         sut.registerQuotaManagerFactory(QuantityOverTimeQuotaManager.class.getName(),
                 listener -> new QuantityOverTimeQuotaManager(listener, new TestClock()));
 
@@ -71,6 +76,6 @@ public class QuotaServiceTest extends DataRedisContainerTest {
     private void initializeTestResourceQuota() {
         QuantityOverTimeState defaultState = new QuantityOverTimeState(QuantityOverTimeLimit.limitOf(10, Duration.ofDays(1)), 10, Instant.EPOCH);
         ResourceQuota entity = new ResourceQuota(RESOURCE_ID, QuantityOverTimeQuotaManager.class.getName(), defaultState);
-        resourceQuotaRepository.save(entity);
+        resourceQuotaPersistence.save(entity);
     }
 }
