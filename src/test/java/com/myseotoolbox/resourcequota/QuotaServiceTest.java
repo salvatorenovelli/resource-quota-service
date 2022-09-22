@@ -9,6 +9,8 @@ import com.myseotoolbox.quota4j.quotamanager.quantityovertime.QuantityOverTimeQu
 import com.myseotoolbox.quota4j.quotamanager.quantityovertime.QuantityOverTimeState;
 import com.myseotoolbox.resourcequota.persistence.MongoQuotaPersistence;
 import com.myseotoolbox.resourcequota.persistence.MongoResourceQuotaPersistence;
+import com.myseotoolbox.resourcequota.persistence.QuotaRepository;
+import com.myseotoolbox.resourcequota.persistence.ResourceQuotaRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +24,16 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @DataMongoTest
-@ComponentScan(value="com.myseotoolbox.resourcequota.persistence")
+@ComponentScan(value = "com.myseotoolbox.resourcequota.persistence")
 public class QuotaServiceTest {
     public static final String RESOURCE_ID = "group.resourceId";
     public static final String OWNER_ID = "salvatore";
+
+
+    @Autowired
+    ResourceQuotaRepository resourceQuotaRepository;
+    @Autowired
+    QuotaRepository quotaRepository;
 
     @Autowired
     MongoResourceQuotaPersistence resourceQuotaPersistence;
@@ -36,6 +44,9 @@ public class QuotaServiceTest {
 
     @BeforeEach
     void setUp() {
+        quotaRepository.deleteAll();
+        resourceQuotaRepository.deleteAll();
+
         sut = new QuotaService(resourceQuotaPersistence, quotaPersistence);
 
         sut.registerQuotaManagerFactory(QuantityOverTimeQuotaManager.class.getName(),
