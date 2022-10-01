@@ -1,32 +1,32 @@
 package com.myseotoolbox.resourcequota.persistence;
 
-import com.myseotoolbox.quota4j.model.ResourceQuota;
-import com.myseotoolbox.quota4j.persistence.ResourceQuotaPersistence;
+import com.myseotoolbox.quota4j.model.Quota;
+import com.myseotoolbox.quota4j.persistence.QuotaPersistence;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.Optional;
 
 @Component
-public class MongoResourceQuotaPersistence implements ResourceQuotaPersistence {
+public class MongoResourceQuotaPersistence implements QuotaPersistence {
 
-    private final ResourceQuotaRepository resourceQuotaRepository;
+    private final QuotaRepository quotaRepository;
 
-    public MongoResourceQuotaPersistence(ResourceQuotaRepository resourceQuotaRepository) {
-        this.resourceQuotaRepository = resourceQuotaRepository;
+    public MongoResourceQuotaPersistence(QuotaRepository quotaRepository) {
+        this.quotaRepository = quotaRepository;
     }
 
     @Override
-    public ResourceQuota save(ResourceQuota resourceQuota) {
-        return resourceQuotaRepository.save(resourceQuota);
+    public Quota save(Quota resourceQuota) {
+        return quotaRepository.save(resourceQuota);
     }
 
     @Override
-    public Optional<ResourceQuota> findById(String resourceId) {
-        return resourceQuotaRepository.findById(resourceId);
+    public Optional<Quota> findById(String resourceId) {
+        return quotaRepository.findById(resourceId);
     }
 
-    public Collection<ResourceQuota> findAll() {
-        return resourceQuotaRepository.findAll();
+    public Collection<Quota> findAll() {
+        return quotaRepository.findAll();
     }
 }
