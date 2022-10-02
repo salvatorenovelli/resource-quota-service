@@ -16,9 +16,9 @@ public class QuotaController {
 
     private final QuotaService quotaService;
 
-    @GetMapping("/resources/{resourceId}/owners/{ownerId}")
-    public long getAvailable(@PathVariable String resourceId, @PathVariable String ownerId) {
-        return quotaService.getRemaining(ownerId, resourceId);
+    @GetMapping("/resource/{resourceId}/owner/{ownerId}")
+    public Object getState(@PathVariable String resourceId, @PathVariable String ownerId) {
+        return quotaService.getQuotaState(ownerId, resourceId);
     }
 
     @PostMapping(value = "/resource/{resourceId}/owner/{ownerId}/acquire", produces = MediaType.APPLICATION_JSON_VALUE)

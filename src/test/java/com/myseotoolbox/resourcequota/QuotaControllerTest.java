@@ -23,6 +23,7 @@ import java.time.Instant;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.http.HttpStatus.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -119,6 +120,21 @@ class QuotaControllerTest {
         mockMvc.perform(post("/resource/" + RESOURCE_ID + "/owner/" + OWNER_ID + "/acquire"))
                 .andExpect(status().is(NOT_IMPLEMENTED.value()))
                 .andExpect(content().string(containsString("Quota manager not registered")));
+    }
+
+    @Test
+    void shouldReturnState() throws Exception {
+        givenQuota(RESOURCE_ID)
+                .withRemainingTokens(6)
+                .build();
+
+        mockMvc.perform(get("/resource/" + RESOURCE_ID + "/owner/" + OWNER_ID))
+                .andExpect(status().is(OK.value()))
+                .andDo(print())
+                .andExpect(jsonPath("$.available").value(6))
+                .andExpect(jsonPath("$.lastRefill").value("" + Instant.EPOCH))
+                .andExpect(jsonPath("$.limit.quantity").value(10))
+                .andExpect(jsonPath("$.limit.duration").value("PT24H"));
     }
 
     private QuotaBuilder givenQuota(String resourceId) {
