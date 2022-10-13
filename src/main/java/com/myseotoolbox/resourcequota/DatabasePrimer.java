@@ -26,7 +26,6 @@ public class DatabasePrimer {
     }
 
     @EventListener(ApplicationStartedEvent.class)
-
     public void init() {
         quotaService.registerQuotaManagerFactory(QuantityOverTimeQuotaManager.class.getName(),
                 () -> new QuantityOverTimeQuotaManager(Clock.systemDefaultZone()));
