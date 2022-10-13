@@ -19,13 +19,11 @@ import java.time.Instant;
 @Profile("!test")
 @Configuration
 public class DatabasePrimer {
-
-
-    @Autowired
-    QuotaService quotaService;
-
-    @Autowired
-    QuotaPersistence resourceQuotaPersistence;
+    final QuotaService quotaService;
+    final QuotaPersistence resourceQuotaPersistence;
+    public DatabasePrimer(QuotaService quotaService, QuotaPersistence resourceQuotaPersistence) {this.quotaService = quotaService;
+        this.resourceQuotaPersistence = resourceQuotaPersistence;
+    }
 
     @EventListener(ApplicationStartedEvent.class)
 
